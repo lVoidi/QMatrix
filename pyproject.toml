@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "qtile-config"
+version = "0.1.0"
+description = "My config"
+authors = ["Roarba"]
+license = "MIT"
+readme = "README.md"
+packages = [{include = "qtile_config"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
