@@ -14,6 +14,11 @@ calendar = "gnome-calendar"
 monitor = "htop"
 hwmonitor = f"{terminal} -e {monitor}"
 audio_control = "pavucontrol"
+wireshark = f"{terminal} -e sudo tshark"
+discord = "discord"
+telegram = "telegram-desktop"
+#crypto = '{terminal} -e cointop&'
+crypto = f"{web_browser} https://coinmarketcap.com/currencies/ethereum/"
 
 keys = [
     # A list of available commands that can be bound to keys can be found
@@ -42,7 +47,9 @@ keys = [
     # Unsplit = 1 window displayed, like Max layout, but still with
     # multiple stack panes
     Key([mod], "Right", lazy.screen.next_group(), desc="Next workspace"),
-    Key([mod], "Left", lazy.screen.prev_group(), desc="Next workspace"),
+    Key([mod], "Left", lazy.screen.prev_group(), desc="Previous workspace"),
+    Key([mod], "Up", lazy.next_layout(), desc="Next layout"),
+    Key([mod], "Down", lazy.prev_layout(), desc="Previous layout"),
     Key(
         [mod, "shift"],
         "Return",
@@ -59,13 +66,16 @@ keys = [
         lazy.window.toggle_fullscreen(),
         desc="Toggle fullscreen on the focused window",
     ),
-    Key([mod], "t", lazy.window.toggle_floating(), desc="Toggle floating on the focused window"),
+    Key([mod, "shift"], "Return", lazy.window.toggle_floating(), desc="Toggle floating on the focused window"),
     Key([mod, "shift"], "r", lazy.reload_config(), desc="Reload the config"),
     Key([mod, "control"], "q", lazy.shutdown(), desc="Shutdown Qtile"),
     Key([mod], "r", lazy.spawn(run_cmd), desc="Spawn a command using a prompt widget"),
     Key([mod], "e", lazy.spawn(file_browser), desc="Spawn file browser"),
     Key([mod], "w", lazy.spawn(web_browser), desc="Spawn web browser"),
     Key([mod], "v", lazy.spawn(audio_control), desc="Spawn audio controller"),
+    Key([mod], "d", lazy.spawn(discord), desc="Spawn audio controller"),
+    Key([mod], "t", lazy.spawn(telegram), desc="Spawn audio controller"),
+    Key([mod], "c", lazy.spawn(wireshark), desc="Spawn audio controller"),
     Key([], "Print", lazy.spawn(screenshooter), desc="Spawn screenshooter")
 ]
 
@@ -112,6 +122,19 @@ layouts = [
         border_width=5,
         margin=10,
     ),
+    layout.Floating(
+        border_focus="#00ff00",
+        border_normal="#009900",
+        float_rules=[
+            *layout.Floating.default_float_rules,
+            Match(wm_class="confirmreset"),  # gitk
+            Match(wm_class="makebranch"),  # gitk
+            Match(wm_class="maketag"),  # gitk
+            Match(wm_class="ssh-askpass"),  # ssh-askpass
+            Match(title="branchdialog"),  # gitk
+            Match(title="pinentry"),  # GPG key password entry
+        ]
+    )
 ]
 
 widget_defaults = dict(
@@ -174,23 +197,73 @@ screens = [
                 ),
                 widget.TextBox(
                     "NET",
-                    mouse_callbacks={"Button1": lazy.spawn(hwmonitor)},
+                    mouse_callbacks={"Button1": lazy.spawn(wireshark)},
                     foreground="#00ff00"
                 ),
                 widget.NetGraph(
                     frequency=0.05,
-                    mouse_callbacks={"Button1": lazy.spawn(hwmonitor)},
+                    mouse_callbacks={"Button1": lazy.spawn(wireshark)},
                     graph_color="#00ff00",
                     fill_color="#00ff00",
                     border_color="#00ff00"
                 ),
                 widget.Spacer(bar.STRETCH),
+                widget.TextBox(
+                    "󰒢",
+                    foreground="#006a00",
+                    fontsize=60,
+                    mouse_callbacks={
+                        "Button1": lazy.spawn(crypto)
+                    },
+
+                ),
+                widget.CryptoTicker(
+                    background="#006a00",
+                    fontsize=20,
+                    crypto="ETH",
+                    mouse_callbacks={
+                        "Button1": lazy.spawn(crypto)
+                    },
+                    format="  {amount:.0f}$"
+                ),
+
                 widget.Clock(
-                    format="%I:%M %p",
-                    background="#00ff00",
+                    format=" %I:%M %p",
+                    background="#009000",
                     fontsize=20,
                     mouse_callbacks={"Button1": lazy.spawn(calendar)}
                 ),
+                widget.CurrentLayout(
+                    background="#00af00",
+                    foreground="#000000",
+                    fontsize=20,
+                    fmt="|{}|"
+                ),
+                widget.TextBox(
+                    " ",
+                    foreground="#000000",
+                    background="#00ff00",
+                    fontsize=30,
+                    mouse_callbacks={"Button1": lazy.spawn("systemctl poweroff")}
+                ),
+
+                widget.TextBox(
+                    " ",
+                    foreground="#000000",
+                    background="#00ff00",
+                    fontsize=30,
+                    mouse_callbacks={"Button1": lazy.spawn("systemctl reboot")}
+                ),
+
+                # 
+                widget.TextBox(
+                    " ",
+                    foreground="#000000",
+                    background="#00ff00",
+                    fontsize=30,
+                    mouse_callbacks={"Button1": lazy.spawn("systemctl suspend")}
+                ),
+
             ],
             30,
             #border_width=[1, 0, 5, 0],  # Draw top and bottom borders
@@ -209,6 +282,8 @@ mouse = [
 dgroups_key_binder = None
 dgroups_app_rules = []  
 floating_layout = layout.Floating(
+    border_focus="#00ff00",
+    border_normal="#009900",
     float_rules=[
         # Run the utility of `xprop` to see the wm class and name of an X client.
         *layout.Floating.default_float_rules,
@@ -231,4 +306,6 @@ wmname = "DELTA"
 
 @hook.subscribe.startup
 def on_init():
+    subprocess.Popen("/usr/lib/policykit-1-gnome/polkit-gnome-authentication-agent-1")
+    subprocess.run(["xrandr", "--output", "HDMI-A-0", "--mode", "1920x1080"])
     subprocess.run(["setxkbmap", "us", "-variant", "altgr-intl"])
