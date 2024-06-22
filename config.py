@@ -4,6 +4,23 @@ from libqtile.lazy import lazy
 import subprocess
 from libqtile.utils import guess_terminal
 
+# Colors
+
+crypto_color ="#8899b9"
+clock_color = "#7689af"
+layout_color = "#697ea8"
+systray_color = "#6076a2"
+button_colors = "#506997"
+
+#crypto_color = "#506997"
+#clock_color = "#6076a2"
+#layout_color = "#697ea8"
+#systray_color = "#7689af"
+#button_colors = "#8899b9"
+
+main_color = "#4a6496"
+dim_color = "#455c89"
+
 mod = "mod4"
 terminal = "alacritty"
 web_browser = "firefox-esr"
@@ -41,7 +58,7 @@ keys = [
     Key([mod, "control"], "l", lazy.layout.grow_right(), desc="Grow window to the right"),
     Key([mod, "control"], "j", lazy.layout.grow_down(), desc="Grow window down"),
     Key([mod, "control"], "k", lazy.layout.grow_up(), desc="Grow window up"),
-    Key([mod], "n", lazy.layout.normalize(), desc="Reset all window sizes"),
+    Key([mod], "n", lazy.window.toggle_minimize(), desc="Reset all window sizes"),
     # Toggle between split and unsplit sides of stack.
     # Split = all windows displayed
     # Unsplit = 1 window displayed, like Max layout, but still with
@@ -117,14 +134,14 @@ for index, group in enumerate(groups):
 layouts = [
     layout.Columns(
         border_focus_stack=["00ff00", "00ff00"],
-        border_focus="#00ff00",
-        border_normal="#009900",
+        border_focus=main_color,
+        border_normal=dim_color,
         border_width=5,
         margin=10,
     ),
     layout.Floating(
-        border_focus="#00ff00",
-        border_normal="#009900",
+        border_focus=main_color,
+        border_normal=dim_color,
         float_rules=[
             *layout.Floating.default_float_rules,
             Match(wm_class="confirmreset"),  # gitk
@@ -153,18 +170,18 @@ screens = [
             [
                 widget.TextBox(
                     " ",
-                    foreground="#00ff00",
-                    fontsize=30,
+                    foreground=main_color,
+                    fontsize=35,
                     mouse_callbacks={
                         "Button1": lazy.spawn(run_cmd)
                     }
                 ),
                 widget.GroupBox(
                     highlight_method='line',
-                    active="#00ff00",
+                    active=main_color,
                     font="Hack Nerd Font",
                     this_current_screen_border="#ffffff",
-                    fontsize=15,
+                    fontsize=25,
                     fontshadow="#003300",
                     #background="#008800",
                     margin=3,
@@ -173,44 +190,47 @@ screens = [
                 widget.Spacer(bar.STRETCH),
                 widget.TextBox(
                     "CPU",
-                    foreground="#00ff00",
+                    fontsize=15,
+                    foreground=main_color,
                     mouse_callbacks={"Button1": lazy.spawn(hwmonitor)},
                 ),
                 widget.CPUGraph(
                     frequency=0.05,
-                    graph_color="#00ff00",
-                    fill_color="#00ff00",
+                    graph_color=main_color,
+                    fill_color=main_color,
                     mouse_callbacks={"Button1": lazy.spawn(hwmonitor)},
-                    border_color="#00ff00"
+                    border_color=main_color
                 ),
                 widget.TextBox(
                     "MEM",
+                    fontsize=15,
                     mouse_callbacks={"Button1": lazy.spawn(hwmonitor)},
-                    foreground="#00ff00"
+                    foreground=main_color
                 ),
                 widget.MemoryGraph(
                     frequency=0.05,
                     mouse_callbacks={"Button1": lazy.spawn(hwmonitor)},
-                    graph_color="#00ff00",
-                    fill_color="#00ff00",
-                    border_color="#00ff00"
+                    graph_color=main_color,
+                    fill_color=main_color,
+                    border_color=main_color
                 ),
                 widget.TextBox(
                     "NET",
+                    fontsize=15,
                     mouse_callbacks={"Button1": lazy.spawn(wireshark)},
-                    foreground="#00ff00"
+                    foreground=main_color
                 ),
                 widget.NetGraph(
                     frequency=0.05,
                     mouse_callbacks={"Button1": lazy.spawn(wireshark)},
-                    graph_color="#00ff00",
-                    fill_color="#00ff00",
-                    border_color="#00ff00"
+                    graph_color=main_color,
+                    fill_color=main_color,
+                    border_color=main_color
                 ),
                 widget.Spacer(bar.STRETCH),
                 widget.TextBox(
                     "󰒢",
-                    foreground="#006a00",
+                    foreground=crypto_color,
                     fontsize=60,
                     mouse_callbacks={
                         "Button1": lazy.spawn(crypto)
@@ -218,7 +238,7 @@ screens = [
 
                 ),
                 widget.CryptoTicker(
-                    background="#006a00",
+                    background=crypto_color,
                     fontsize=20,
                     crypto="ETH",
                     mouse_callbacks={
@@ -229,20 +249,24 @@ screens = [
 
                 widget.Clock(
                     format=" %I:%M %p",
-                    background="#009000",
+                    background=clock_color,
                     fontsize=20,
                     mouse_callbacks={"Button1": lazy.spawn(calendar)}
                 ),
                 widget.CurrentLayout(
-                    background="#00af00",
+                    background=layout_color,
                     foreground="#000000",
                     fontsize=20,
                     fmt="|{}|"
                 ),
+
+                widget.Systray(
+                    background=systray_color
+                ),
                 widget.TextBox(
                     " ",
                     foreground="#000000",
-                    background="#00ff00",
+                    background=button_colors,
                     fontsize=30,
                     mouse_callbacks={"Button1": lazy.spawn("systemctl poweroff")}
                 ),
@@ -250,22 +274,21 @@ screens = [
                 widget.TextBox(
                     " ",
                     foreground="#000000",
-                    background="#00ff00",
+                    background=button_colors,
                     fontsize=30,
                     mouse_callbacks={"Button1": lazy.spawn("systemctl reboot")}
                 ),
-
                 # 
                 widget.TextBox(
                     " ",
                     foreground="#000000",
-                    background="#00ff00",
+                    background=button_colors,
                     fontsize=30,
                     mouse_callbacks={"Button1": lazy.spawn("systemctl suspend")}
                 ),
 
             ],
-            30,
+            35,
             #border_width=[1, 0, 5, 0],  # Draw top and bottom borders
             #border_color=["aaffaa", "000000", "77ff77", "000000"]  # Borders are magenta
         ),
@@ -282,8 +305,8 @@ mouse = [
 dgroups_key_binder = None
 dgroups_app_rules = []  
 floating_layout = layout.Floating(
-    border_focus="#00ff00",
-    border_normal="#009900",
+    border_focus=main_color,
+    border_normal=dim_color,
     float_rules=[
         # Run the utility of `xprop` to see the wm class and name of an X client.
         *layout.Floating.default_float_rules,
