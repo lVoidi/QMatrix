@@ -23,8 +23,8 @@ dim_color = "#455c89"
 
 mod = "mod4"
 terminal = "alacritty"
-web_browser = "firefox-esr"
-file_browser = "nautilus -w"
+web_browser = "firefox"
+file_browser = "thunar"
 run_cmd = "rofi -show drun"
 screenshooter = "flameshot gui"
 calendar = "gnome-calendar"
@@ -67,6 +67,12 @@ keys = [
     Key([mod], "Left", lazy.screen.prev_group(), desc="Previous workspace"),
     Key([mod], "Up", lazy.next_layout(), desc="Next layout"),
     Key([mod], "Down", lazy.prev_layout(), desc="Previous layout"),
+    Key([], "XF86AudioLowerVolume", lazy.spawn("amixer sset Master 5%-"), desc="Lower Volume by 5%"),
+    Key([], "XF86AudioRaiseVolume", lazy.spawn("amixer sset Master 5%+"), desc="Raise Volume by 5%"),
+    Key([], "XF86AudioMute", lazy.spawn("amixer sset Master 1+ toggle"), desc="Mute/Unmute Volume"),
+    Key([], "XF86AudioPlay", lazy.spawn("playerctl play-pause"), desc="Play/Pause player"),
+    Key([], "XF86AudioNext", lazy.spawn("playerctl next"), desc="Skip to next"),
+    Key([], "XF86AudioPrev", lazy.spawn("playerctl previous"), desc="Skip to previous"), 
     Key(
         [mod, "shift"],
         "Return",
