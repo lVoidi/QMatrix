@@ -1,3 +1,2 @@
 # Qmatrix 
-
-![image](https://i.imgur.com/4WBPeFV.png)
+This is my personal config for wayland QTile. I am currently working on a python-tk screenshoter, flameshot-like.
